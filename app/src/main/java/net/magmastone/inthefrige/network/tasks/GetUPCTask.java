@@ -14,10 +14,10 @@ import net.magmastone.inthefrige.network.UPCItem;
  * Created by alex on 3/4/15.
  */
 public class GetUPCTask extends AsyncTask<String,String,UPCItem> {
-    public Activity calledActivity;
 
-    public GetUPCTask(Activity a){
-        calledActivity=a;
+    public NetworkResults caller;
+    public GetUPCTask(NetworkResults delegate){
+        caller=delegate;
     }
 ;    @Override
     protected UPCItem doInBackground(String... params) {
@@ -31,23 +31,12 @@ public class GetUPCTask extends AsyncTask<String,String,UPCItem> {
     @Override
     protected void onPostExecute(UPCItem upcItem) {
         super.onPostExecute(upcItem);
-        UPCItem it = upcItem;
         Log.d("GetUPCTask", "Doing something with it...");
-        if(it.status.equals("N")) {
-          //  Intent myIntent = new Intent(calledActivity, NewItemActivity.class);
-          //  myIntent.putExtra("UPC", it.upc); //Optional parameters
-          //  Log.d("BroadcastReceiver", "Didn't find, setting up...");
-          //  calledActivity.startActivityForResult(myIntent, 1023);
-            //Need a rework here.
+        caller.NetworkSuccess(upcItem);
+    }
 
-        }else{
-            Context ctx = calledActivity.getApplicationContext();
-            CharSequence text = "Item found!"+it.itemname;
-            int duration = Toast.LENGTH_SHORT;
-            Log.d("BroadcastReceiver", "Found!");
-            Toast toast = Toast.makeText(ctx, text, duration);
-            toast.show();
-
-        }
+    public interface NetworkResults{
+        public void NetworkSuccess(UPCItem it);
+        public void NetworkFailed(String reason);
     }
 }

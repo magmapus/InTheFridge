@@ -2,6 +2,8 @@ package net.magmastone.inthefrige;
 
 import java.util.Locale;
 
+import android.content.Context;
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
@@ -17,9 +19,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import net.magmastone.inthefrige.network.UPCItem;
+import net.magmastone.inthefrige.network.tasks.GetUPCTask;
 
 
-public class MainActivity extends ActionBarActivity implements ActionBar.TabListener {
+public class MainActivity extends ActionBarActivity implements ActionBar.TabListener, ScannerTab.ScannerInteraction {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -114,6 +120,44 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+           IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
+           if (scanResult != null) {
+               if (scanResult.getFormatName().contains("UPC")) {
+                   String upc=scanResult.getContents();
+                    //TODO: Look at this network access method when not sick and tired.
+                   final Context context = this.getApplicationContext();
+                   new GetUPCTask(new GetUPCTask.NetworkResults(){
+                       @Override
+                       public void NetworkSuccess(UPCItem it){
+                        if(it.status.equals("N")){
+                            Toast.makeText(context,"Item not found!",2);
+                        }else{
+                            Toast.makeText(context,"Item found! "+it.itemname,2);
+                        }
+                       }
+                       @Override
+                       public void NetworkFailed(String reason){
+
+                       }
+                   }).execute(upc);
+               } else {
+                   Context context = this.getApplicationContext();
+                   CharSequence text = "Scan failed! Try again!";
+                   int duration = Toast.LENGTH_SHORT;
+
+                   Toast toast = Toast.makeText(context, text, duration);
+                   toast.show();
+               }
+           }
+
+         }
+
+    @Override
+    public void goScan(){
+        new IntentIntegrator(this).initiateScan();
+    }
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
@@ -128,7 +172,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(position + 1);
+            return ScannerTab.newInstance();
         }
 
         @Override

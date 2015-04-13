@@ -1,0 +1,13 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" tools:context="net.magmastone.inthefrige.ScannerTab">
+
+    <!-- TODO: Update blank fragment layout -->
+
+    <Button
+        android:layout_width="284dp"
+        android:layout_height="393dp"
+        android:text="Scan"
+        android:id="@+id/scan"
+        android:layout_gravity="center" />
+</FrameLayout>
