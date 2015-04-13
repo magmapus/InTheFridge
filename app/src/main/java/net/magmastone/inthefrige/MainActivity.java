@@ -2,6 +2,7 @@ package net.magmastone.inthefrige;
 
 import java.util.Locale;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
@@ -12,6 +13,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -23,10 +25,11 @@ import android.widget.Toast;
 
 import net.magmastone.inthefrige.network.UPCItem;
 import net.magmastone.inthefrige.network.tasks.GetUPCTask;
+import net.magmastone.inthefrige.network.tasks.NewUPCTask;
 
 
 public class MainActivity extends ActionBarActivity implements ActionBar.TabListener, ScannerTab.ScannerInteraction {
-
+    public static final int newItemRcode=0x00302;
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -128,13 +131,19 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                    String upc=scanResult.getContents();
                     //TODO: Look at this network access method when not sick and tired.
                    final Context context = this.getApplicationContext();
+                   final Activity ourActivity = this;
                    new GetUPCTask(new GetUPCTask.NetworkResults(){
                        @Override
                        public void NetworkSuccess(UPCItem it){
                         if(it.status.equals("N")){
-                            Toast.makeText(context,"Item not found!",2);
+                            Log.d("NetworkResults","NotFound");
+                            Toast.makeText(context,"Item not found!",Toast.LENGTH_SHORT).show();
+                            Intent myIntent = new Intent(ourActivity, NewItemActivity.class);
+                            myIntent.putExtra("UPC", it.upc); //Optional parameters
+                            ourActivity.startActivityForResult(myIntent,newItemRcode);
                         }else{
-                            Toast.makeText(context,"Item found! "+it.itemname,2);
+                            Log.d("NetworkResults", "Found");
+                            Toast.makeText(context,"Item found! "+it.itemname,Toast.LENGTH_SHORT).show();
                         }
                        }
                        @Override
@@ -151,6 +160,18 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                    toast.show();
                }
            }
+        if(requestCode == newItemRcode){
+            if(resultCode==RESULT_OK) {
+                Log.d("ReturningResult", "AllGood");
+                String itemName = intent.getStringExtra("name");
+                String itemType = intent.getStringExtra("type");
+                String itemUPC = intent.getStringExtra("upc");
+                String itemImage = intent.getStringExtra("image");
+                String itemExpiry = intent.getStringExtra("expiry");
+                new NewUPCTask(this).execute(itemUPC, itemName, itemType, itemImage, itemExpiry);
+                Log.d("ReturnedItem", itemName + " " + itemType + " " + itemUPC + " " + itemExpiry);
+            }
+        }
 
          }
 
