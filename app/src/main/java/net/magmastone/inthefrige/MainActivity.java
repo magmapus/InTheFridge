@@ -136,7 +136,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                        @Override
                        public void NetworkSuccess(UPCItem it){
                         if(it.status.equals("N")){
-                            Log.d("NetworkResults","NotFound");
+                            Log.d("Netw+orkResults","NotFound");
                             Toast.makeText(context,"Item not found!",Toast.LENGTH_SHORT).show();
                             Intent myIntent = new Intent(ourActivity, NewItemActivity.class);
                             myIntent.putExtra("UPC", it.upc); //Optional parameters
@@ -177,7 +177,11 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 
     @Override
     public void goScan(){
-        new IntentIntegrator(this).initiateScan();
+
+        //new IntentIntegrator(this).initiateScan();
+        Intent myIntent = new Intent(this, CheckinItemActivity.class);
+        myIntent.putExtra("UPC", "1010");
+        this.startActivityForResult(myIntent,newItemRcode);
     }
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to

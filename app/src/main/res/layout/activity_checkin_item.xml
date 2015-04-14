@@ -6,7 +6,46 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context="net.magmastone.inthefrige.CheckinItemActivity">
 
-    <TextView android:text="@string/hello_world" android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/newitemimageView"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Save"
+        android:id="@+id/newitemsave"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
+
+    <SeekBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/newitembar"
+        android:layout_centerVertical="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:max="10" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Quantity"
+        android:id="@+id/newitemquant"
+        android:layout_below="@+id/newitembar"
+        android:layout_centerHorizontal="true" />
+
+    <DatePicker
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/checkinexpiry"
+        android:datePickerMode="spinner"
+        android:layout_gravity="center_horizontal"
+        android:calendarViewShown="false"
+        android:layout_weight="1"
+        android:layout_above="@+id/newitemsave"
+        android:layout_centerHorizontal="true" />
 </RelativeLayout>
