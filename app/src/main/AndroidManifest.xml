@@ -2,6 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="net.magmastone.inthefrige" >
 
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -20,7 +26,10 @@
             android:name=".NewItemActivity"
             android:label="New Item" >
         </activity>
+        <activity
+            android:name=".CheckinItemActivity"
+            android:label="@string/title_activity_checkin_item" >
+        </activity>
     </application>
-    <uses-feature android:name="android.hardware.camera" android:required="true" />
-    <uses-permission android:name="android.permission.INTERNET" />
+
 </manifest>
