@@ -15,4 +15,11 @@ public interface UPCDatabase {
     @FormUrlEncoded
     @POST("/")
     UPCItem postItem(@Field("upc") String upc, @Field("name") String name, @Field("type") String type, @Field("pic") String pic, @Field("expiry") String expiry);
+    @GET("/status")
+    FRGItem getStatus(@Query("upc") String upcCode);
+    @FormUrlEncoded
+    @POST("/checkin")
+    FRGItem postFrg(@Field("upc") String upc, @Field("uname") String name, @Field("quant") String quan, @Field("expiry") String exp);
+    @GET("/checkin")
+    FRGItem remItem(@Query("upc") String upc, @Query("uname") String name);
 }

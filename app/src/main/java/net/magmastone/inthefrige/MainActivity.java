@@ -3,7 +3,9 @@ package net.magmastone.inthefrige;
 import java.util.Locale;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
@@ -23,9 +25,12 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import net.magmastone.inthefrige.network.FRGItem;
 import net.magmastone.inthefrige.network.UPCItem;
+import net.magmastone.inthefrige.network.tasks.GetFRGStatusTask;
 import net.magmastone.inthefrige.network.tasks.GetUPCTask;
 import net.magmastone.inthefrige.network.tasks.NewUPCTask;
+import net.magmastone.inthefrige.network.tasks.SetFRGStatusTask;
 
 
 public class MainActivity extends ActionBarActivity implements ActionBar.TabListener, ScannerTab.ScannerInteraction {
@@ -131,19 +136,64 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                    String upc=scanResult.getContents();
                     //TODO: Look at this network access method when not sick and tired.
                    final Context context = this.getApplicationContext();
+                   final Context popContext = MainActivity.this;
                    final Activity ourActivity = this;
                    new GetUPCTask(new GetUPCTask.NetworkResults(){
                        @Override
-                       public void NetworkSuccess(UPCItem it){
+                       public void NetworkSuccess(final UPCItem it){
                         if(it.status.equals("N")){
                             Log.d("Netw+orkResults","NotFound");
-                            Toast.makeText(context,"Item not found!",Toast.LENGTH_SHORT).show();
                             Intent myIntent = new Intent(ourActivity, NewItemActivity.class);
                             myIntent.putExtra("UPC", it.upc); //Optional parameters
                             ourActivity.startActivityForResult(myIntent,newItemRcode);
                         }else{
-                            Log.d("NetworkResults", "Found");
-                            Toast.makeText(context,"Item found! "+it.itemname,Toast.LENGTH_SHORT).show();
+                            Log.d("NetworkResults", "Found"+it.itemname);
+
+                            new GetFRGStatusTask(new GetFRGStatusTask.NetworkResults() {
+                                @Override
+                                public void NetworkSuccess(FRGItem itm) {
+                                    if(itm.status.equals("N") || itm.quantity==0) {
+                                        Log.d("NS,FRGStatus",itm.status);
+                                        launchAct();
+                                    }else{
+                                        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                switch (which){
+                                                    case DialogInterface.BUTTON_POSITIVE:
+
+                                                        launchAct();
+                                                        break;
+
+                                                    case DialogInterface.BUTTON_NEGATIVE:
+
+                                                        launchRem();
+                                                        break;
+                                                }
+                                            }
+                                        };
+
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(popContext);
+                                        builder.setMessage("You already have "+String.valueOf(itm.quantity)+"  "+it.itemname).setPositiveButton("Add More", dialogClickListener)
+                                                .setNegativeButton("Check Out", dialogClickListener).show();
+                                    }
+                                }
+                                private void launchAct(){
+                                    Intent myIntent = new Intent(ourActivity, CheckinItemActivity.class);
+                                    Log.d("upctest", it.upc);
+                                    myIntent.putExtra("UPC", it.upc);
+                                    ourActivity.startActivity(myIntent);
+                                }
+                                private  void launchRem(){
+                                    new SetFRGStatusTask(null).execute(it.upc,String.valueOf(-1));
+                                }
+
+                                @Override
+                                public void NetworkFailed(String reason) {
+
+                                }
+                            }).execute(it.upc);
+
                         }
                        }
                        @Override
@@ -168,7 +218,25 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                 String itemUPC = intent.getStringExtra("upc");
                 String itemImage = intent.getStringExtra("image");
                 String itemExpiry = intent.getStringExtra("expiry");
-                new NewUPCTask(this).execute(itemUPC, itemName, itemType, itemImage, itemExpiry);
+                final Activity ourActivity = this;
+
+                new NewUPCTask(new NewUPCTask.NetworkResults(){
+
+                        @Override
+                        public void NetworkSuccess(UPCItem it){
+                            Intent myIntent = new Intent(ourActivity, CheckinItemActivity.class);
+                            myIntent.putExtra("UPC", it.upc);
+                            Log.d("upctest",it.upc);
+                            ourActivity.startActivity(myIntent);
+                        }
+
+                        @Override
+                        public void NetworkFailed(String reason){
+
+                        }
+                }).execute(itemUPC, itemName, itemType, itemImage, itemExpiry);
+
+
                 Log.d("ReturnedItem", itemName + " " + itemType + " " + itemUPC + " " + itemExpiry);
             }
         }
@@ -178,10 +246,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     @Override
     public void goScan(){
 
-        //new IntentIntegrator(this).initiateScan();
-        Intent myIntent = new Intent(this, CheckinItemActivity.class);
-        myIntent.putExtra("UPC", "1010");
-        this.startActivityForResult(myIntent,newItemRcode);
+        new IntentIntegrator(this).initiateScan();
+
     }
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to

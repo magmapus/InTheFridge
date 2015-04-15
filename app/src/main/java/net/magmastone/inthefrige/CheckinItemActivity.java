@@ -10,27 +10,39 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import net.magmastone.inthefrige.network.FRGItem;
 import net.magmastone.inthefrige.network.UPCItem;
 import net.magmastone.inthefrige.network.tasks.GetUPCTask;
+import net.magmastone.inthefrige.network.tasks.SetFRGStatusTask;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
 public class CheckinItemActivity extends ActionBarActivity {
 
     private TextView tv;
     private ImageView iv;
+    private String upc;
+    private SeekBar sbar;
+    private DatePicker dp;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_checkin_item);
-        SeekBar sbar= (SeekBar) findViewById(R.id.newitembar);
-        String upc = getIntent().getStringExtra("upc");
+        sbar= (SeekBar) findViewById(R.id.newitembar);
+        Intent i =getIntent();
+        upc = i.getStringExtra("UPC");
+        Log.d("CheckIn",upc);
+        dp= (DatePicker) findViewById(R.id.checkinexpiry);
         tv = (TextView) findViewById(R.id.newitemquant);
-        tv.setText("0");
+        tv.setText("1");
         iv = (ImageView) findViewById(R.id.newitemimageView);
         new GetUPCTask(new GetUPCTask.NetworkResults(){
             @Override
@@ -52,7 +64,7 @@ public class CheckinItemActivity extends ActionBarActivity {
         sbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                tv.setText(String.valueOf(progress));
+                tv.setText(String.valueOf(progress+1));
             }
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
@@ -84,7 +96,25 @@ public class CheckinItemActivity extends ActionBarActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            return true;
+            int   day  = dp.getDayOfMonth();
+            int   month= dp.getMonth();
+            int   year = dp.getYear();
+
+            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+            String formatedDate = sdf.format(new Date(year, month, day));
+
+            new SetFRGStatusTask(new SetFRGStatusTask.NetworkResults() {
+                @Override
+                public void NetworkSuccess(FRGItem it) {
+                    finish();
+                }
+
+                @Override
+                public void NetworkFailed(String reason) {
+
+                }
+            }).execute(upc,String.valueOf(tv.getText()),formatedDate);
+
         }
 
         return super.onOptionsItemSelected(item);

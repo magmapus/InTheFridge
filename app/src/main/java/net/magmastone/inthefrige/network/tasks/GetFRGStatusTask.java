@@ -1,38 +1,42 @@
 package net.magmastone.inthefrige.network.tasks;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
 
+import net.magmastone.inthefrige.network.FRGItem;
 import net.magmastone.inthefrige.network.NetworkInterfacer;
 import net.magmastone.inthefrige.network.UPCItem;
 
 /**
  * Created by alex on 3/4/15.
  */
-public class NewUPCTask extends AsyncTask<String,String,UPCItem> {
+public class GetFRGStatusTask extends AsyncTask<String,String,FRGItem> {
 
     public NetworkResults caller;
-    public NewUPCTask(NetworkResults a){
-        caller=a;
+    public GetFRGStatusTask(NetworkResults delegate){
+        caller=delegate;
     }
+    ;    @Override
+         protected FRGItem doInBackground(String... params) {
 
-        @Override
-    protected UPCItem doInBackground(String... params) {
         NetworkInterfacer iface = new NetworkInterfacer("192.168.0.183:8080");
-        UPCItem item=iface.db.postItem(params[0],params[1],params[2],params[3],params[4]);
-        Log.d("NewUPCTask", "Posted a UPC");
+        FRGItem item=iface.db.getStatus(params[0]);
         return item;
     }
 
     @Override
-    protected void onPostExecute(UPCItem upcItem) {
+    protected void onPostExecute(FRGItem upcItem) {
         super.onPostExecute(upcItem);
+        Log.d("GetUPCTask", "Doing something with it...");
         caller.NetworkSuccess(upcItem);
     }
 
     public interface NetworkResults{
-        public void NetworkSuccess(UPCItem it);
+        public void NetworkSuccess(FRGItem it);
         public void NetworkFailed(String reason);
     }
 }
