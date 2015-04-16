@@ -14,7 +14,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".MainActivity"
+            android:name=".activities.MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,11 +23,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".NewItemActivity"
+            android:name=".activities.NewItemActivity"
             android:label="New Item" >
         </activity>
         <activity
-            android:name=".CheckinItemActivity"
+            android:name=".activities.CheckinItemActivity"
             android:label="@string/title_activity_checkin_item" >
         </activity>
     </application>

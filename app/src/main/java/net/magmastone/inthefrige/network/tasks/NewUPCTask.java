@@ -19,7 +19,7 @@ public class NewUPCTask extends AsyncTask<String,String,UPCItem> {
 
         @Override
     protected UPCItem doInBackground(String... params) {
-        NetworkInterfacer iface = new NetworkInterfacer("192.168.0.183:8080");
+        NetworkInterfacer iface = new NetworkInterfacer("10.23.131.68:8080");
         UPCItem item=iface.db.postItem(params[0],params[1],params[2],params[3],params[4]);
         Log.d("NewUPCTask", "Posted a UPC");
         return item;

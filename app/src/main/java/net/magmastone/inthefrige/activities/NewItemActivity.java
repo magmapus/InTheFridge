@@ -1,4 +1,4 @@
-package net.magmastone.inthefrige;
+package net.magmastone.inthefrige.activities;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -14,6 +14,8 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import net.magmastone.inthefrige.R;
 
 import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;

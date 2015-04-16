@@ -1,4 +1,4 @@
-package net.magmastone.inthefrige;
+package net.magmastone.inthefrige.activities;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -16,6 +16,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import net.magmastone.inthefrige.R;
 import net.magmastone.inthefrige.network.FRGItem;
 import net.magmastone.inthefrige.network.UPCItem;
 import net.magmastone.inthefrige.network.tasks.GetUPCTask;

@@ -23,7 +23,7 @@ public class GetFRGStatusTask extends AsyncTask<String,String,FRGItem> {
     ;    @Override
          protected FRGItem doInBackground(String... params) {
 
-        NetworkInterfacer iface = new NetworkInterfacer("192.168.0.183:8080");
+        NetworkInterfacer iface = new NetworkInterfacer("10.23.131.68:8080");
         FRGItem item=iface.db.getStatus(params[0]);
         return item;
     }

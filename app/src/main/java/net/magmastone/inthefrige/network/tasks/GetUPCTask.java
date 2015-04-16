@@ -22,7 +22,7 @@ public class GetUPCTask extends AsyncTask<String,String,UPCItem> {
 ;    @Override
     protected UPCItem doInBackground(String... params) {
 
-        NetworkInterfacer iface = new NetworkInterfacer("192.168.0.183:8080");
+        NetworkInterfacer iface = new NetworkInterfacer("10.23.131.68:8080");
         UPCItem item=iface.db.getItem(params[0]);
         Log.d("GetUPCTask", "Got a UPC....");
         return item;

@@ -16,7 +16,6 @@ class index:
 		todos= db.select('upcs', where="id='"+i["upc"]+"'");
 		try:
 			upc=todos[0]
-
 			return json.dumps(dict({'status':"G",'upc':i.upc}.items()+upc.items())) # combine the two. 
 		except:
 			return json.dumps({'status':"N", 'upc':i.upc})
@@ -55,10 +54,10 @@ class status:
 		i=web.input()
 		frg= db.select('frg', where="upcid='"+i.upc+"'");
 		#print frg[0].items()
-		#try:
-		return json.dumps(dict({'status':"G",'upc':i.upc}.items()+frg[0].items()))
-		#except:
-		#	return json.dumps({'status':"N", 'upc':i.upc})
+		try:
+			return json.dumps(dict({'status':"G",'upc':i.upc}.items()+frg[0].items()))
+		except:
+			return json.dumps({'status':"N", 'upc':i.upc})
 
 if __name__ == "__main__": 
     app = web.application(urls, globals())

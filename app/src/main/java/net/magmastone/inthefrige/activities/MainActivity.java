@@ -1,4 +1,4 @@
-package net.magmastone.inthefrige;
+package net.magmastone.inthefrige.activities;
 
 import java.util.Locale;
 
@@ -16,15 +16,18 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import net.magmastone.inthefrige.IntentIntegrator;
+import net.magmastone.inthefrige.IntentResult;
+import net.magmastone.inthefrige.R;
+import net.magmastone.inthefrige.fragments.FridgeFragment;
+import net.magmastone.inthefrige.fragments.ScannerTab;
 import net.magmastone.inthefrige.network.FRGItem;
 import net.magmastone.inthefrige.network.UPCItem;
 import net.magmastone.inthefrige.network.tasks.GetFRGStatusTask;
@@ -134,7 +137,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
            if (scanResult != null) {
                if (scanResult.getFormatName().contains("UPC")) {
                    String upc=scanResult.getContents();
-                    //TODO: Look at this network access method when not sick and tired.
+
                    final Context context = this.getApplicationContext();
                    final Context popContext = MainActivity.this;
                    final Activity ourActivity = this;
@@ -142,7 +145,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                        @Override
                        public void NetworkSuccess(final UPCItem it){
                         if(it.status.equals("N")){
-                            Log.d("Netw+orkResults","NotFound");
+                            Log.d("NetworkResults", "NotFound");
                             Intent myIntent = new Intent(ourActivity, NewItemActivity.class);
                             myIntent.putExtra("UPC", it.upc); //Optional parameters
                             ourActivity.startActivityForResult(myIntent,newItemRcode);
@@ -263,7 +266,13 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
-            return ScannerTab.newInstance();
+            if(position==0) {
+                return ScannerTab.newInstance();
+            }else if (position==2) {
+                return FridgeFragment.newInstance("a","b");
+            }else{
+                return PlaceholderFragment.newInstance(position);
+            }
         }
 
         @Override
