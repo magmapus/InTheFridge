@@ -1,5 +1,7 @@
 package net.magmastone.inthefrige.network;
 
+import java.util.List;
+
 import retrofit.http.Field;
 import retrofit.http.FormUrlEncoded;
 import retrofit.http.GET;
@@ -22,4 +24,10 @@ public interface UPCDatabase {
     FRGItem postFrg(@Field("upc") String upc, @Field("uname") String name, @Field("quant") String quan, @Field("expiry") String exp);
     @GET("/checkin")
     FRGItem remItem(@Query("upc") String upc, @Query("uname") String name);
+
+    @GET("/frgData")
+    List<FRGItem> frgItems();
+
+    @GET("/frgupcData")
+    List<UPCItem> frgupcItems();
 }

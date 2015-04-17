@@ -19,24 +19,34 @@ public class GetUPCTask extends AsyncTask<String,String,UPCItem> {
     public GetUPCTask(NetworkResults delegate){
         caller=delegate;
     }
-;    @Override
-    protected UPCItem doInBackground(String... params) {
 
-        NetworkInterfacer iface = new NetworkInterfacer("10.23.131.68:8080");
-        UPCItem item=iface.db.getItem(params[0]);
-        Log.d("GetUPCTask", "Got a UPC....");
-        return item;
+    public Exception ex;
+    @Override
+    protected UPCItem doInBackground(String... params) {
+        try {
+            NetworkInterfacer iface = new NetworkInterfacer("192.168.0.183:8080");
+            UPCItem item = iface.db.getItem(params[0]);
+            Log.d("GetUPCTask", "Got a UPC....");
+            return item;
+        }catch (Exception e){
+            ex=e;
+            return null;
+        }
     }
 
     @Override
     protected void onPostExecute(UPCItem upcItem) {
-        super.onPostExecute(upcItem);
-        Log.d("GetUPCTask", "Doing something with it...");
-        caller.NetworkSuccess(upcItem);
+        if(upcItem != null) {
+            super.onPostExecute(upcItem);
+            Log.d("GetUPCTask", "Doing something with it...");
+            caller.NetworkSuccess(upcItem);
+        }else{
+            caller.NetworkFailed(ex);
+        }
     }
 
     public interface NetworkResults{
         public void NetworkSuccess(UPCItem it);
-        public void NetworkFailed(String reason);
+        public void NetworkFailed(Exception e);
     }
 }

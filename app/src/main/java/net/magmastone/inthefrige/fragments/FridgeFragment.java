@@ -14,7 +14,9 @@ import android.widget.TextView;
 
 import net.magmastone.inthefrige.R;
 
+import net.magmastone.inthefrige.network.FRGItem;
 import net.magmastone.inthefrige.network.UPCItem;
+import net.magmastone.inthefrige.utility.FRGAdapter;
 
 /**
  * A fragment representing a list of Items.
@@ -47,7 +49,7 @@ public class FridgeFragment extends Fragment implements AbsListView.OnItemClickL
      * The Adapter which will be used to populate the ListView/GridView with
      * Views.
      */
-    private ListAdapter mAdapter;
+    private FRGAdapter mAdapter;
 
     // TODO: Rename and change types of parameters
     public static FridgeFragment newInstance(String param1, String param2) {
@@ -58,7 +60,9 @@ public class FridgeFragment extends Fragment implements AbsListView.OnItemClickL
         fragment.setArguments(args);
         return fragment;
     }
-
+    public void updateList(){
+        mAdapter.updateList();
+    }
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -74,12 +78,9 @@ public class FridgeFragment extends Fragment implements AbsListView.OnItemClickL
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-        String[] values = new String[] { "Android", "iPhone", "WindowsMobile",
-                "Blackberry", "WebOS", "Ubuntu", "Windows7", "Max OS X",
-                "Linux", "OS/2" };
-        // TODO: Change Adapter to display your content
-        mAdapter = new ArrayAdapter<String>(getActivity(),
-                android.R.layout.simple_list_item_1, android.R.id.text1,values);
+
+
+        mAdapter = new FRGAdapter(getActivity());
     }
 
     @Override

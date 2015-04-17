@@ -46,13 +46,6 @@
         android:layout_weight="1" />
 
 
-    <DatePicker
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/expiry"
-        android:datePickerMode="spinner"
-        android:layout_gravity="center_horizontal"
-        android:calendarViewShown="false"
-        android:layout_weight="1" />
+
 
 </LinearLayout>

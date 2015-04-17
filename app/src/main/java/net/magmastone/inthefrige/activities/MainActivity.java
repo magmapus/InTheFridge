@@ -135,7 +135,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
            IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
            if (scanResult != null) {
-               if (scanResult.getFormatName().contains("UPC")) {
+               Log.d("mainScan",scanResult.getFormatName());
+               if (scanResult.getFormatName().contains("UPC")|| scanResult.getFormatName().contains("EAN")) {
                    String upc=scanResult.getContents();
 
                    final Context context = this.getApplicationContext();
@@ -192,16 +193,16 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                                 }
 
                                 @Override
-                                public void NetworkFailed(String reason) {
-
+                                public void NetworkFailed(Exception e) {
+                                    MainActivity.this.nFailed(e);
                                 }
                             }).execute(it.upc);
 
                         }
                        }
                        @Override
-                       public void NetworkFailed(String reason){
-
+                       public void NetworkFailed(Exception e){
+                           MainActivity.this.nFailed(e);
                        }
                    }).execute(upc);
                } else {
@@ -234,8 +235,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                         }
 
                         @Override
-                        public void NetworkFailed(String reason){
-
+                        public void NetworkFailed(Exception e){
+                            MainActivity.this.nFailed(e);
                         }
                 }).execute(itemUPC, itemName, itemType, itemImage, itemExpiry);
 
@@ -246,6 +247,15 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 
          }
 
+    public void nFailed(Exception e){
+        String failureReason = e.getClass().getName();
+        if(failureReason.equals("retrofit.RetrofitError")){
+            Toast.makeText(this,"Network Error. Try connecting to WiFi!",Toast.LENGTH_SHORT).show();
+
+        }else{
+            Toast.makeText(this,e.getLocalizedMessage(),Toast.LENGTH_SHORT).show();
+        }
+    }
     @Override
     public void goScan(){
 

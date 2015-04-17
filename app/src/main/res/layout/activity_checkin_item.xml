@@ -13,14 +13,6 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Save"
-        android:id="@+id/newitemsave"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
-
     <SeekBar
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -34,6 +26,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Quantity"
+        android:layout_marginTop="20dp"
         android:id="@+id/newitemquant"
         android:layout_below="@+id/newitembar"
         android:layout_centerHorizontal="true" />
@@ -46,6 +39,6 @@
         android:layout_gravity="center_horizontal"
         android:calendarViewShown="false"
         android:layout_weight="1"
-        android:layout_above="@+id/newitemsave"
+        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
 </RelativeLayout>

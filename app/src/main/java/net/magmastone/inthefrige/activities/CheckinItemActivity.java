@@ -1,5 +1,6 @@
 package net.magmastone.inthefrige.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -58,7 +59,7 @@ public class CheckinItemActivity extends ActionBarActivity {
                 }
             }
             @Override
-            public void NetworkFailed(String reason){
+            public void NetworkFailed(Exception e){
 
             }
         }).execute(upc);
@@ -103,7 +104,7 @@ public class CheckinItemActivity extends ActionBarActivity {
 
             SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
             String formatedDate = sdf.format(new Date(year, month, day));
-
+            final Context c=this;
             new SetFRGStatusTask(new SetFRGStatusTask.NetworkResults() {
                 @Override
                 public void NetworkSuccess(FRGItem it) {
@@ -111,8 +112,14 @@ public class CheckinItemActivity extends ActionBarActivity {
                 }
 
                 @Override
-                public void NetworkFailed(String reason) {
+                public void NetworkFailed(Exception e) {
+                    String failureReason = e.getClass().getName();
+                    if(failureReason.equals("retrofit.RetrofitError")){
+                        Toast.makeText(c,"Network Error. Try connecting to WiFi!",Toast.LENGTH_SHORT).show();
 
+                    }else{
+                        Toast.makeText(c,e.getLocalizedMessage(),Toast.LENGTH_SHORT).show();
+                    }
                 }
             }).execute(upc,String.valueOf(tv.getText()),formatedDate);
 

@@ -13,26 +13,36 @@ import net.magmastone.inthefrige.network.UPCItem;
 public class NewUPCTask extends AsyncTask<String,String,UPCItem> {
 
     public NetworkResults caller;
+    public Exception ex;
     public NewUPCTask(NetworkResults a){
         caller=a;
     }
 
         @Override
     protected UPCItem doInBackground(String... params) {
-        NetworkInterfacer iface = new NetworkInterfacer("10.23.131.68:8080");
+    try{
+        NetworkInterfacer iface = new NetworkInterfacer("192.168.0.183:8080");
         UPCItem item=iface.db.postItem(params[0],params[1],params[2],params[3],params[4]);
         Log.d("NewUPCTask", "Posted a UPC");
         return item;
+        }catch (Exception e){
+        ex=e;
+        return null;
+    }
     }
 
     @Override
     protected void onPostExecute(UPCItem upcItem) {
+    if(upcItem!= null){
         super.onPostExecute(upcItem);
         caller.NetworkSuccess(upcItem);
+    }else{
+        caller.NetworkFailed(ex);
+    }
     }
 
     public interface NetworkResults{
         public void NetworkSuccess(UPCItem it);
-        public void NetworkFailed(String reason);
+        public void NetworkFailed(Exception e);
     }
 }

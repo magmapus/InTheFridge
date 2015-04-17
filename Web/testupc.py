@@ -4,7 +4,9 @@ import json
 urls= (
 	'/', 'index',
 	'/checkin','checkin',
-	'/status','status'
+	'/status','status',
+	'/frgData','frgData',
+	'/frgupcData','frgupcData'
 )
 
 
@@ -58,6 +60,33 @@ class status:
 			return json.dumps(dict({'status':"G",'upc':i.upc}.items()+frg[0].items()))
 		except:
 			return json.dumps({'status':"N", 'upc':i.upc})
+
+class  frgData:
+	def GET(self):
+		frg= db.select('frg', where="quantity>0")
+		ar=[]
+		for a in frg:
+			it=dict(a.items())
+			it["status"]="G";
+			it["upc"]=it["upcid"]
+			ar.append(it)
+		print ar
+		return json.dumps(ar)
+
+class  frgupcData:
+	def GET(self):
+		frg= db.select('frg', where="quantity>-1")
+		ar=[]
+		for a in frg:
+			d=dict(a.items())
+			upc=db.select('upcs', where="id='"+d["upcid"]+"'")
+			it=dict(upc[0].items())
+			it["status"]="G"
+			it["upc"]=it["id"]
+			ar.append(it)
+		print ar
+		return json.dumps(ar);
+
 
 if __name__ == "__main__": 
     app = web.application(urls, globals())

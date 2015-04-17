@@ -85,18 +85,11 @@ public class NewItemActivity extends ActionBarActivity {
             Intent intent = new Intent();
             intent.putExtra("upc", upcForItem);
             intent.putExtra("image", imageB64);
-            DatePicker dp = (DatePicker)findViewById(R.id.expiry);
+
             EditText nme = (EditText)findViewById(R.id.itemname);
             EditText tpe = (EditText)findViewById(R.id.itemType);
 
-            int   day  = dp.getDayOfMonth();
-            int   month= dp.getMonth();
-            int   year = dp.getYear();
-
-            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-            String formatedDate = sdf.format(new Date(year, month, day));
-
-            intent.putExtra("expiry", formatedDate);
+            intent.putExtra("expiry", "");
             intent.putExtra("name",nme.getText().toString());
             intent.putExtra("type",tpe.getText().toString());
             this.setResult(RESULT_OK, intent);
