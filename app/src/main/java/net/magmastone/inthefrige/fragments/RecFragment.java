@@ -18,9 +18,8 @@ import android.widget.TextView;
 
 import net.magmastone.inthefrige.R;
 
-import net.magmastone.inthefrige.network.FRGItem;
-import net.magmastone.inthefrige.network.UPCItem;
-import net.magmastone.inthefrige.utility.FRGAdapter;
+import net.magmastone.inthefrige.fragments.dummy.DummyContent;
+import net.magmastone.inthefrige.utility.RECAdapter;
 
 /**
  * A fragment representing a list of Items.
@@ -28,21 +27,13 @@ import net.magmastone.inthefrige.utility.FRGAdapter;
  * Large screen devices (such as tablets) are supported by replacing the ListView
  * with a GridView.
  * <p/>
- * Activities containing this fragment MUST implement the
+ * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
  * interface.
  */
-public class FridgeFragment extends Fragment implements AbsListView.OnItemClickListener {
+public class RecFragment extends Fragment implements AbsListView.OnItemClickListener {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    private FridgeFragmentDelegate mListener;
+    private RecFragmentListener mListener;
 
     /**
      * The fragment's ListView/GridView.
@@ -53,46 +44,38 @@ public class FridgeFragment extends Fragment implements AbsListView.OnItemClickL
      * The Adapter which will be used to populate the ListView/GridView with
      * Views.
      */
-    private FRGAdapter mAdapter;
+    private RECAdapter mAdapter;
 
     // TODO: Rename and change types of parameters
-    public static FridgeFragment newInstance(String param1, String param2) {
-        FridgeFragment fragment = new FridgeFragment();
+    public static RecFragment newInstance() {
+        RecFragment fragment = new RecFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+
         fragment.setArguments(args);
         return fragment;
     }
-    public void updateList(){
-        mAdapter.updateList();
-    }
+
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public FridgeFragment() {
+    public RecFragment() {
     }
-
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
 
+        // TODO: Change Adapter to display your content
+        mAdapter = new RECAdapter(getActivity());
 
-        mAdapter = new FRGAdapter(getActivity());
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_fridge, container, false);
+        View view = inflater.inflate(R.layout.fragment_recitem, container, false);
 
         // Set the adapter
         mListView = (AbsListView) view.findViewById(android.R.id.list);
@@ -107,7 +90,12 @@ public class FridgeFragment extends Fragment implements AbsListView.OnItemClickL
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-
+        try {
+            mListener = (RecFragmentListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
     }
 
     @Override
@@ -115,7 +103,6 @@ public class FridgeFragment extends Fragment implements AbsListView.OnItemClickL
         super.onDetach();
         mListener = null;
     }
-
     BroadcastReceiver rcvr= new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -134,13 +121,16 @@ public class FridgeFragment extends Fragment implements AbsListView.OnItemClickL
 
         getActivity().unregisterReceiver(rcvr);
     }
+    public void updateList(){
+        mAdapter.updateList();
+    }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         if (null != mListener) {
             // Notify the active callbacks interface (the activity, if the
             // fragment is attached to one) that an item has been selected.
-          //  mListener.onFragmentInteraction(DummyContent.ITEMS.get(position).id);
+            mListener.onFragmentInteraction(mAdapter.getItem(position).url);
         }
     }
 
@@ -167,8 +157,9 @@ public class FridgeFragment extends Fragment implements AbsListView.OnItemClickL
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface FridgeFragmentDelegate {
-
+    public interface RecFragmentListener {
+        // TODO: Update argument type and name
+        public void onFragmentInteraction(String id);
     }
 
 }

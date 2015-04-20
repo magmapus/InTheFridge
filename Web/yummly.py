@@ -41,7 +41,7 @@ class Yummly:
 		newlist.reverse()
 		last=[]
 		for r in  newlist[:10]:
-			last.append(y.getRecipie(r["id"]))
+			last.append(self.getRecipie(r["id"]))
 		return last
 	def getCourses(self):
 		q=self.s.get("http://api.yummly.com/v1/api/metadata/course")

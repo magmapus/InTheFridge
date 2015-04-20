@@ -108,6 +108,10 @@ public class CheckinItemActivity extends ActionBarActivity {
             new SetFRGStatusTask(new SetFRGStatusTask.NetworkResults() {
                 @Override
                 public void NetworkSuccess(FRGItem it) {
+
+                    Intent intent = new Intent();
+                    intent.setAction("net.magmastone.NewItem");
+                    sendBroadcast(intent);
                     finish();
                 }
 

@@ -7,6 +7,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
@@ -27,16 +28,19 @@ import net.magmastone.inthefrige.IntentIntegrator;
 import net.magmastone.inthefrige.IntentResult;
 import net.magmastone.inthefrige.R;
 import net.magmastone.inthefrige.fragments.FridgeFragment;
+import net.magmastone.inthefrige.fragments.RecFragment;
 import net.magmastone.inthefrige.fragments.ScannerTab;
+import net.magmastone.inthefrige.fragments.ShoppingFragment;
 import net.magmastone.inthefrige.network.FRGItem;
 import net.magmastone.inthefrige.network.UPCItem;
+import net.magmastone.inthefrige.network.tasks.AddShoppingItemTask;
 import net.magmastone.inthefrige.network.tasks.GetFRGStatusTask;
 import net.magmastone.inthefrige.network.tasks.GetUPCTask;
 import net.magmastone.inthefrige.network.tasks.NewUPCTask;
 import net.magmastone.inthefrige.network.tasks.SetFRGStatusTask;
 
 
-public class MainActivity extends ActionBarActivity implements ActionBar.TabListener, ScannerTab.ScannerInteraction {
+public class MainActivity extends ActionBarActivity implements ActionBar.TabListener, ScannerTab.ScannerInteraction,RecFragment.RecFragmentListener {
     public static final int newItemRcode=0x00302;
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -135,7 +139,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
            IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
            if (scanResult != null) {
-               Log.d("mainScan",scanResult.getFormatName());
                if (scanResult.getFormatName().contains("UPC")|| scanResult.getFormatName().contains("EAN")) {
                    String upc=scanResult.getContents();
 
@@ -189,7 +192,43 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                                     ourActivity.startActivity(myIntent);
                                 }
                                 private  void launchRem(){
-                                    new SetFRGStatusTask(null).execute(it.upc,String.valueOf(-1));
+                                    Intent intent = new Intent();
+                                    intent.setAction("net.magmastone.NewItem");
+                                    sendBroadcast(intent);
+                                    new SetFRGStatusTask(new SetFRGStatusTask.NetworkResults(){
+
+                                        @Override
+                                        public void NetworkSuccess(final FRGItem it) {
+                                            if(it.quantity <= 0){
+                                                AlertDialog.Builder builder = new AlertDialog.Builder(popContext);
+
+                                                DialogInterface.OnClickListener dialogClickListener2 = new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        switch (which){
+                                                            case DialogInterface.BUTTON_POSITIVE:
+                                                                MainActivity.this.addToList(it.upc);
+                                                                Intent intent = new Intent();
+                                                                intent.setAction("net.magmastone.NewItem");
+                                                                sendBroadcast(intent);
+                                                                break;
+
+                                                            case DialogInterface.BUTTON_NEGATIVE:
+
+                                                                break;
+                                                        }
+                                                    }
+                                                };
+                                                builder.setMessage("You used the last one!").setPositiveButton("Add to list", dialogClickListener2)
+                                                        .setNegativeButton("Ignore", dialogClickListener2).show();
+                                            }
+                                        }
+
+                                        @Override
+                                        public void NetworkFailed(Exception e) {
+                                            MainActivity.this.nFailed(e);
+                                        }
+                                    }).execute(it.upc,String.valueOf(-1));
                                 }
 
                                 @Override
@@ -246,7 +285,19 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         }
 
          }
+    public void addToList(String upc){
+        new AddShoppingItemTask(new AddShoppingItemTask.NetworkResults() {
+            @Override
+            public void NetworkSuccess() {
 
+            }
+
+            @Override
+            public void NetworkFailed(Exception e) {
+                MainActivity.this.nFailed(e);
+            }
+        }).execute(upc);
+    }
     public void nFailed(Exception e){
         String failureReason = e.getClass().getName();
         if(failureReason.equals("retrofit.RetrofitError")){
@@ -261,6 +312,10 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 
         new IntentIntegrator(this).initiateScan();
 
+    }
+    public void onFragmentInteraction(String id){
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(id));
+        startActivity(browserIntent);
     }
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
@@ -279,7 +334,11 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             if(position==0) {
                 return ScannerTab.newInstance();
             }else if (position==2) {
-                return FridgeFragment.newInstance("a","b");
+                return FridgeFragment.newInstance("a", "b");
+            }else if(position==1){
+                return RecFragment.newInstance();
+            }else if (position==3) {
+                return ShoppingFragment.newInstance();
             }else{
                 return PlaceholderFragment.newInstance(position);
             }
@@ -288,7 +347,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         @Override
         public int getCount() {
             // Show 3 total pages.
-            return 3;
+            return 4;
         }
 
         @Override
@@ -301,6 +360,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                     return getString(R.string.title_section2).toUpperCase(l);
                 case 2:
                     return getString(R.string.title_section3).toUpperCase(l);
+                case 3:
+                    return getString(R.string.shoppingString).toUpperCase(l);
             }
             return null;
         }

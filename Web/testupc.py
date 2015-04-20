@@ -1,12 +1,16 @@
 import web
 import json
+from yummly import Yummly
+from datetime import datetime, date, time
 
 urls= (
 	'/', 'index',
 	'/checkin','checkin',
 	'/status','status',
 	'/frgData','frgData',
-	'/frgupcData','frgupcData'
+	'/frgupcData','frgupcData',
+	'/slist','slist',
+	'/rec','rec'
 )
 
 
@@ -48,6 +52,7 @@ class checkin:
 			pass
 		db.query("INSERT OR IGNORE INTO frg (upcid,name,expiry,quantity) VALUES ('"+i["upc"]+"','"+i["uname"]+"','"+i["expiry"]+"',0)")
 		db.query("UPDATE `frg` SET `quantity`=`quantity`+"+str(quant)+",`name`='"+i["uname"]+"',`expiry`='"+i["expiry"]+"' WHERE `upcid`='"+i.upc+"'")
+		db.query("DELETE from `slist2` WHERE `upc`='"+i["upc"]+"'")
 		frg= db.select('frg', where="upcid='"+i.upc+"'");
 		return json.dumps(dict({'status':"G",'upc':i.upc}.items()+frg[0].items()))
 
@@ -73,9 +78,25 @@ class  frgData:
 		print ar
 		return json.dumps(ar)
 
+class slist:
+	def GET(self):
+		uc=db.select('slist2')
+		ar=[]
+		for i in uc:
+			it=dict(i.items())
+			uc2=db.select('upcs', where="id='"+it["upc"]+"'")
+			it=dict(uc2[0].items())
+			it["status"]="G"
+			it["upc"]=it["id"]
+			ar.append(it)
+		return json.dumps(ar)
+	def POST(self):
+		i=web.input()
+		db.query("INSERT INTO `slist2` (upc) VALUES (\'"+i["upc"]+"\')")
+
 class  frgupcData:
 	def GET(self):
-		frg= db.select('frg', where="quantity>-1")
+		frg= db.select('frg', where="quantity>0")
 		ar=[]
 		for a in frg:
 			d=dict(a.items())
@@ -84,8 +105,28 @@ class  frgupcData:
 			it["status"]="G"
 			it["upc"]=it["id"]
 			ar.append(it)
-		print ar
-		return json.dumps(ar);
+		return json.dumps(ar)
+
+class rec:
+	def GET(self):
+		frg= db.select('frg', where="quantity>0")
+		ar=[]
+		for a in frg:
+			d=dict(a.items())
+			upc=db.select('upcs', where="id='"+d["upcid"]+"'")
+			it=dict(upc[0].items())
+			ar.append(it["itemtype"])
+		y=Yummly()
+		y.setup('d579507d','736c339e12b7a287c72c2de82313657e')
+		dtme=datetime.now()
+		z=dtme.hour
+		course="course^course-Breakfast and Brunch"
+		if(z > 10):
+			course="course^course-Lunch and Snacks"
+		elif (z>16):
+			course="course^course-Main Dishes"
+		print "using course:"+course
+		return json.dumps(y.getAll(ar,course))
 
 
 if __name__ == "__main__": 

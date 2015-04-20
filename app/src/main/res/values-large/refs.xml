@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
     <!--
@@ -8,5 +9,7 @@
     http://developer.android.com/training/multiscreen/screensizes.html#TaskUseAliasFilters
     -->
     <item name="fragment_fridge" type="layout">@layout/fragment_fridge_grid</item>
+    <item name="fragment_upcitem" type="layout">@layout/fragment_upcitem_grid</item>
+    <item name="fragment_recitem" type="layout">@layout/fragment_recitem_grid</item>
 
 </resources>
